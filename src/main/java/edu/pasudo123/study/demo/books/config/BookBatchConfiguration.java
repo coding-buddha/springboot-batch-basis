@@ -1,4 +1,4 @@
-package edu.pasudo123.study.demo.config;
+package edu.pasudo123.study.demo.books.config;
 
 import edu.pasudo123.study.demo.books.model.Book;
 import edu.pasudo123.study.demo.books.notification.CompleteNotificationListener;
@@ -24,9 +24,8 @@ import javax.sql.DataSource;
 
 @Profile("profile-book")
 @Configuration
-@EnableBatchProcessing
 @RequiredArgsConstructor
-public class CustomBookBatchConfiguration {
+public class BookBatchConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
