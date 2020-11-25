@@ -40,11 +40,9 @@ public class CustomBatchConfiguration {
         return new FlatFileItemReaderBuilder<Book>()
                 .name("bookItemReader")
                 .resource(new ClassPathResource("seoul_dongjak_book_list.csv"))
-                .delimited()
+                .delimited().delimiter(",")
                 .names("regId", "title", "publisher", "year", "author", "callName", "isbn", "library", "libraryReference", "price")
-                .fieldSetMapper(new BeanWrapperFieldSetMapper<Book>(){{
-                    setTargetType(Book.class);
-                }})
+                .targetType(Book.class)
                 .build();
     }
 
@@ -61,7 +59,7 @@ public class CustomBatchConfiguration {
     public JdbcBatchItemWriter<Book> writer(DataSource dataSource) {
         return new JdbcBatchItemWriterBuilder<Book>()
                 .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-                .sql("INSERT INTO book () VALUES (:regId, :title, :publisher, :year, :author, :callName, :isbn, :library, :libraryReference, :price")
+                .sql("INSERT INTO books VALUES (:regId, :title, :publisher, :year, :author, :callName, :isbn, :library, :libraryReference, :price)")
                 .dataSource(dataSource)
                 .build();
     }

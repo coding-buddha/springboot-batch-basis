@@ -1,23 +1,26 @@
 package edu.pasudo123.study.demo.books.model;
 
-import lombok.Getter;
-import lombok.ToString;
+import lombok.*;
 
+@Setter
 @Getter
 @ToString
+@NoArgsConstructor(access = AccessLevel.PUBLIC)
 public class Book {
-    private final String regId;
-    private final String title;
-    private final String publisher;
-    private final String year;
-    private final String author;
-    private final String callName;
-    private final String isbn;
-    private final String library;
-    private final String libraryReference;
-    private final String price;
+    private String regId;
+    private String title;
+    private String publisher;
+    private Long year;
+    private String author;
+    private String callName;
+    private String isbn;
+    private String library;
+    private String libraryReference;
+    private Long price;
 
-    public Book(String regId, String title, String publisher, String year, String author, String callName, String isbn, String library, String libraryReference, String price) {
+    @Builder
+    public Book(String regId, String title, String publisher, Long year, String author,
+                String callName, String isbn, String library, String libraryReference, Long price) {
         this.regId = regId;
         this.title = title;
         this.publisher = publisher;
