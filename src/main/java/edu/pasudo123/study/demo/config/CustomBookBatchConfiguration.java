@@ -15,22 +15,23 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
 
+@Profile("profile-book")
 @Configuration
 @EnableBatchProcessing
 @RequiredArgsConstructor
-public class CustomBatchConfiguration {
+public class CustomBookBatchConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
 
-    /** ================ start : reader & writer processor ================ **/
+    /** ================ start : reader & processor & writer ================ **/
     /**
      * csv 파일을 읽어들이는 itemReader 를 만든다.
      * parsing 을 하면서, Book class 로 변환시킨다.
@@ -39,7 +40,7 @@ public class CustomBatchConfiguration {
     public FlatFileItemReader<Book> reader() {
         return new FlatFileItemReaderBuilder<Book>()
                 .name("bookItemReader")
-                .resource(new ClassPathResource("seoul_dongjak_book_list.csv"))
+                .resource(new ClassPathResource("csv/book_list.csv"))
                 .delimited().delimiter(",")
                 .names("regId", "title", "publisher", "year", "author", "callName", "isbn", "library", "libraryReference", "price")
                 .targetType(Book.class)
@@ -53,7 +54,6 @@ public class CustomBatchConfiguration {
 
     /**
      * itemWriter 를 만든다.
-     *
      */
     @Bean
     public JdbcBatchItemWriter<Book> writer(DataSource dataSource) {
