@@ -64,7 +64,7 @@ public class SaveStepConfiguration {
         return stepBuilderFactory.get(SAVE_STEP)
                 .<StoreItem, Store> chunk(CHUNK_SIZE)
                 .reader(saveJobReader())
-                .processor(saveJobProcessor())
+                .processor(saveJobProcessor())  // processor 는 필수가 아니다. 데이터에 대한 변경로직이 없다면 processor 제외가 가능
                 .writer(jpaItemWriter())
                 .build();
     }

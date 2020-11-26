@@ -5,7 +5,7 @@
     * java11
     * windows10
 
-## 🔥 batch application
+## 🔥 배치 에플리케이션
 * 수 많은 데이터를 일괄처리하기 위한 애플리케이션을 의미
     * 왜, 수 많은 데이터를 일괄로 처리해야 하는가?
         * 단 건으로 처리할 시에 많은 리소스가 소요된다.
@@ -17,9 +17,9 @@
 * 배치와 스케줄링은 서로 긴밀하게 연관되어 있다.
     * `배치` 는 일괄처리
     * `스케줄링` 은 정해진 시간마다 프로세스 구동
-    * "`배치` 를 일정시간마다 실행시킬 수 있도록 `스케줄링` 을 적용한다." 라는 개념으로 접근
+    * `배치` 를 일정시간마다 실행시킬 수 있도록 `스케줄링` 을 적용한다. 라는 개념
 
-## 🔥 scheduling to help with batch application
+## 🔥 배치를 도와줄 스케줄러
 * 배치를 도와줄 스케줄러는 아래와 같이 있다.
     * linux cron
     * jenkins
@@ -30,6 +30,5 @@
 
 ## reference
 * https://docs.spring.io/spring-batch/docs/current/reference/html/index.html
-* 그 외
-    * [jojoldu blog](https://jojoldu.tistory.com/324)
-    * [renuevo blog](https://renuevo.github.io/spring/batch/spring-batch-chapter-1/)
+* [jojoldu blog](https://jojoldu.tistory.com/324)
+* [renuevo blog](https://renuevo.github.io/spring/batch/spring-batch-chapter-1/)

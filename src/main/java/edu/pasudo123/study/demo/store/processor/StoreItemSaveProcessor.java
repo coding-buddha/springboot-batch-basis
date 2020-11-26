@@ -13,7 +13,7 @@ public class StoreItemSaveProcessor implements ItemProcessor<StoreItem, Store> {
 
     @Override
     public Store process(StoreItem item) {
-        log.info("current item : {}", item);
+        log.info("to save item : {}", item);
         return item.toStoreEntity();
     }
 }

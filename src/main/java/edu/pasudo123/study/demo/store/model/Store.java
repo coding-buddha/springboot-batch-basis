@@ -35,4 +35,8 @@ public class Store {
         this.address = address;
         this.phoneNumber = phoneNumber;
     }
+
+    public void updateId(final Long id) {
+        this.id = id;
+    }
 }

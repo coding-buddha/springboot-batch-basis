@@ -28,31 +28,8 @@ public class StoreBatchConfiguration {
         return jobBuilderFactory.get("storeJob")
                 .incrementer(new RunIdIncrementer())    // 동일 파라미터 재 실행하고 싶은 경우 : RunIdIncrementer 이 제공
                 .listener(listener)
-//                .start(saveStep)
-                .start(deleteStep)
+                .start(saveStep)
+                .next(deleteStep)
                 .build();
     }
-
-
-//    /**
-//     * db 에 저장된 데이터 로우를 삭제하는 delete step
-//     */
-//    @Bean
-//    public Step deleteStep() {
-//        return stepBuilderFactory.get(DELETE_STEP)
-//                .<Store, Store> chunk(CHUNK_SIZE)
-//                .reader(saveJobReader)
-//                .processor(saveJobProcessor)
-//                .writer(jpaItemWriter())
-//                .build();
-//    }
-//
-//    @Bean
-//    public JpaItemWriter<Store> jpaItemWriter() {
-//        // jpa 를 사용하기 때문에, EntityManagerFactory 를 할당해준다.
-//        return new JpaItemWriterBuilder<Store>()
-//                .entityManagerFactory(entityManagerFactory)
-//                .usePersist(true)
-//                .build();
-//    }
 }

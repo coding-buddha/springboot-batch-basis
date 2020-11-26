@@ -1,6 +1,5 @@
 package edu.pasudo123.study.demo.notification;
 
-import edu.pasudo123.study.demo.store.repository.StoreRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
