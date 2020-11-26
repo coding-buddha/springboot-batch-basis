@@ -2,6 +2,7 @@
 * 스프링부트 기반의 배치를 hello world 수준으로 do-it do-it
 * 환경
     * springboot 2.3.6.RELEASE
+    * spring-batch 4.2.4.RELEASE
     * java11
     * windows10
 
@@ -27,6 +28,14 @@
     * spring scheduler (spring dependency 가 있는 경우)
     * github action
     * 등등
+
+## 🔥 배치를 작성하면서 겪는 `유의사항`
+* 프로세스 실행 중에 재할당에 시간을 소모하지 않도록 배치 애플리케이션 시작 시 충분한 메모리를 할당하기
+
+
+## 🔥 배치를 작성하면서 겪는 `궁금증`
+* cursor & paging 의 차이
+
 
 ## reference
 * https://docs.spring.io/spring-batch/docs/current/reference/html/index.html
