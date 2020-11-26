@@ -1,12 +1,11 @@
 package edu.pasudo123.study.demo.books.config;
 
 import edu.pasudo123.study.demo.books.model.Book;
-import edu.pasudo123.study.demo.books.notification.CompleteNotificationListener;
+import edu.pasudo123.study.demo.notification.NotificationListener;
 import edu.pasudo123.study.demo.books.processor.BookItemProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -70,7 +69,7 @@ public class BookBatchConfiguration {
      * job 을 정의한다.
      */
     @Bean
-    public Job importUserJob(CompleteNotificationListener listener, Step firstStep){
+    public Job importUserJob(NotificationListener listener, Step firstStep){
         return jobBuilderFactory.get("importUserJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)

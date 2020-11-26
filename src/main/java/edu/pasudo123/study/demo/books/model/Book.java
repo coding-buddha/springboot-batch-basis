@@ -2,6 +2,10 @@ package edu.pasudo123.study.demo.books.model;
 
 import lombok.*;
 
+/**
+ * itemReader 를 통해서 읽어들이는 경우, 
+ * 기본 생성자가 public 선언이 되어있어야 한다.
+ */
 @Setter
 @Getter
 @ToString
