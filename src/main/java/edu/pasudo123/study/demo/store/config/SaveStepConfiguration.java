@@ -14,7 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
-import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManagerFactory;
 
@@ -44,8 +43,10 @@ public class SaveStepConfiguration {
         return new StoreItemSaveProcessor();
     }
 
+    /**
+     * 저장을 수행.
+     */
     @Bean
-    @Transactional
     public JpaItemWriter<Store> jpaItemWriter() {
         // jpa 를 사용하기 때문에, EntityManagerFactory 를 할당해준다.
         return new JpaItemWriterBuilder<Store>()

@@ -3,6 +3,21 @@ spring:
   profiles:
     active: dev
 
+  datasource:
+    url: jdbc:mysql://localhost:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true&useTimezone=true&serverTimezone=Asia/Seoul
+    username: root
+    password: rootpass
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    platform: mysql
+
+  jpa:
+    database-platform: org.hibernate.dialect.MySQL57Dialect
+    hibernate:
+      ddl-auto: validate
+    generate-ddl: true
+    show-sql: true
+    properties.hibernate.format_sql: false
+
 ---
 spring:
   profiles: test
@@ -31,22 +46,3 @@ spring:
     show-sql: false                               # true 설정 시, 콘솔에 JPA 쿼리를 보여준다.
     properties.hibernate.format_sql: true         # true 설정 시, 콘솔에 표시되는 쿼리를 가독성있게 보여준다.
     properties.hibernate.use_sql_comments: false  # true 설정 시, 콘솔에 표시되는 쿼리문 위에 어떤 실행을 하려는지 hint 를 보여준다.
-
----
-spring:
-  profiles: dev
-
-  datasource:
-    url: jdbc:mysql://localhost:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true&useTimezone=true&serverTimezone=Asia/Seoul
-    username: root
-    password: rootpass
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    platform: mysql
-
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL57Dialect
-    hibernate:
-      ddl-auto: validate
-    generate-ddl: true
-    show-sql: true
-    properties.hibernate.format_sql: true
