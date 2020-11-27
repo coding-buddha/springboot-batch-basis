@@ -32,11 +32,6 @@ public class DeleteStepConfiguration {
     private static final String DELETE_STEP = "deleteStep";
     private static final int CHUNK_SIZE = 20;
 
-    /**
-     * 특정한 조건을 기준으로 page_size 만큼 SELECT 수행
-     * TODO 데이터를 삭제처리하는 조건으로 읽어들이면 limit ?, ? 로 나가는데, 데이터 삭제가 일부 누락된다.
-     * @return
-     */
     @Bean
     public JpaPagingItemReader<Store> deleteJobReader() {
         return new JpaPagingItemReaderBuilder<Store>()

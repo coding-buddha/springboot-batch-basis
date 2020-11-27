@@ -1,4 +1,5 @@
 # ItemReader 의 cursor vs paging 차이점
+
 ## cursor 🍁
 * JDBC ResultSet 으로 select 쿼리에 대한 결과값을 반환받는다.
 * ResultSet 은 현재 로우에 커서를 유지시킨다.
@@ -60,6 +61,57 @@ public JdbcCursorItemReader<Store> deleteJobReader() {
 * ex) `SELECT * FROM store LIMIT {rownum}, {count};`
     * `SELECT * FROM store LIMIT 0, 5;` : 0번째부터 5개 들고온다.
     * `SELECT * FROM store LIMIT 5, 5;` : 5번째부터 5개 들고온다.
+
+### JpaPagingItemReader 구현 및 상속 구조
+<img src="../images/JpaPagingItemReader.png" style="text-align: center;" width="700px" />
+
+### code sample
+```java
+@Bean
+public JpaPagingItemReader<Store> deleteJobReader() {
+    return new JpaPagingItemReaderBuilder<Store>()
+            .name("storeItemReader")
+            .entityManagerFactory(entityManagerFactory)
+            .pageSize(CHUNK_SIZE)                                   // 조회개수
+            .queryString("SELECT item FROM Store item")             // 조건절 설정
+            .build();
+}
+
+// AbstractPagingItemReader.class 부분
+@Nullable
+	@Override
+	protected T doRead() throws Exception {
+
+		synchronized (lock) {
+
+			if (results == null || current >= pageSize) {
+
+				if (logger.isDebugEnabled()) {
+					logger.debug("Reading page " + getPage());
+				}
+
+				doReadPage();
+				page++;
+				if (current >= pageSize) {
+					current = 0;
+				}
+
+			}
+
+			int next = current++;
+			if (next < results.size()) {
+				return results.get(next);
+			}
+			else {
+				return null;
+			}
+
+		}
+
+	}
+```
+* rownum 이 상태가 유지되기 때문에 만약 데이터 로우에 대한 컬럼 업데이트가 아닌 삭제로 처리하는 경우에 일부 데이터는 삭제되지 않는다.
+* rownum 은 증가하고 count 는 증가되는데, 매번 쿼리로 select 문을 날릴때마다 데이터는 삭제되어서 갯수가 다시 갱신되기 때문이다.
     
 
 
