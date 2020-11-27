@@ -69,6 +69,7 @@ public class DeleteStepConfiguration {
                     }
                 })
                 .fetchSize(CHUNK_SIZE)
+                .driverSupportsAbsolute(true)
                 .build();
     }
 

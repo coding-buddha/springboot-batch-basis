@@ -34,7 +34,8 @@
 
 
 ## 🔥 배치를 작성하면서 겪는 `궁금증`
-* cursor & paging 의 차이
+* ItemReader 의 cursor & paging 의 차이
+* 
 
 
 ## reference
