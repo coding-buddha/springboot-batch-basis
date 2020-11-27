@@ -54,7 +54,7 @@ public class DeleteStepConfiguration {
         return new JdbcCursorItemReaderBuilder<Store>()
                 .dataSource(dataSource)
                 .name("storeItemReader")
-                .sql("SELECT id, no, name, address, phone_number FROM store")
+                .sql("SELECT id, no, name, address, phone_number FROM store WHERE no >= 50")
                 .rowMapper(new RowMapper<Store>(){
                     @Override
                     public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
@@ -68,8 +68,8 @@ public class DeleteStepConfiguration {
                         return store;
                     }
                 })
-                .fetchSize(CHUNK_SIZE)
-                .driverSupportsAbsolute(true)
+                .fetchSize(CHUNK_SIZE)          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
+                .driverSupportsAbsolute(true)   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
                 .build();
     }
 
