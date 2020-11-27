@@ -3,6 +3,7 @@
 * 환경
     * springboot 2.3.6.RELEASE
     * spring-batch 4.2.4.RELEASE
+    * mysql 8.0.x
     * java11
     * windows10
 
@@ -34,8 +35,7 @@
 
 
 ## 🔥 배치를 작성하면서 겪는 `궁금증`
-* ItemReader 의 cursor & paging 의 차이
-* 
+* [ItemReader 의 cursor & paging 의 차이](./docs/ItemReader_cursor_vs_paging.md)
 
 
 ## reference

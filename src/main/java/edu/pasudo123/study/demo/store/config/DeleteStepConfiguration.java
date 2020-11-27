@@ -8,7 +8,9 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
+import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
+import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -35,43 +37,43 @@ public class DeleteStepConfiguration {
      * TODO 데이터를 삭제처리하는 조건으로 읽어들이면 limit ?, ? 로 나가는데, 데이터 삭제가 일부 누락된다.
      * @return
      */
-//    @Bean
-//    public JpaPagingItemReader<Store> deleteJobReader() {
-//        return new JpaPagingItemReaderBuilder<Store>()
-//                .name("storeItemReader")
-//                .entityManagerFactory(entityManagerFactory)
-//                .pageSize(CHUNK_SIZE)                                   // 조회개수
-//                .queryString("SELECT item FROM Store item")             // 조건절 설정
-//                .build();
-//    }
-
-    /**
-     * 커서단위로 읽어들이고, 해당 정크사이즈만큼 writer 에서 하도록 한다.
-     * @return
-     */
     @Bean
-    public JdbcCursorItemReader<Store> deleteJobReader() {
-        return new JdbcCursorItemReaderBuilder<Store>()
-                .dataSource(dataSource)
+    public JpaPagingItemReader<Store> deleteJobReader() {
+        return new JpaPagingItemReaderBuilder<Store>()
                 .name("storeItemReader")
-                .sql("SELECT id, no, name, address, phone_number FROM store WHERE no >= 50")
-                .rowMapper(new RowMapper<Store>(){
-                    @Override
-                    public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
-                        Store store = Store.builder()
-                                .no(rs.getLong("no"))
-                                .name(rs.getString("name"))
-                                .address(rs.getString("address"))
-                                .phoneNumber(rs.getString("phone_number"))
-                                .build();
-                        store.updateId(rs.getLong("id"));
-                        return store;
-                    }
-                })
-                .fetchSize(CHUNK_SIZE)          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
-                .driverSupportsAbsolute(true)   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
+                .entityManagerFactory(entityManagerFactory)
+                .pageSize(CHUNK_SIZE)                                   // 조회개수
+                .queryString("SELECT item FROM Store item")             // 조건절 설정
                 .build();
     }
+
+//    /**
+//     * 커서단위로 읽어들이고, 해당 정크사이즈만큼 writer 에서 하도록 한다.
+//     * @return
+//     */
+//    @Bean
+//    public JdbcCursorItemReader<Store> deleteJobReader() {
+//        return new JdbcCursorItemReaderBuilder<Store>()
+//                .dataSource(dataSource)
+//                .name("storeItemReader")
+//                .sql("SELECT id, no, name, address, phone_number FROM store")
+//                .rowMapper(new RowMapper<Store>(){
+//                    @Override
+//                    public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
+//                        Store store = Store.builder()
+//                                .no(rs.getLong("no"))
+//                                .name(rs.getString("name"))
+//                                .address(rs.getString("address"))
+//                                .phoneNumber(rs.getString("phone_number"))
+//                                .build();
+//                        store.updateId(rs.getLong("id"));
+//                        return store;
+//                    }
+//                })
+//                .fetchSize(CHUNK_SIZE)          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
+//                .driverSupportsAbsolute(true)   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
+//                .build();
+//    }
 
     @Bean
     public StoreItemDeleteProcessor deleteJobProcessor() {
