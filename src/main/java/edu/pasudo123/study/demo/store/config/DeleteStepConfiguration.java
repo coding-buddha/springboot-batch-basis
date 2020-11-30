@@ -32,43 +32,31 @@ public class DeleteStepConfiguration {
     private static final String DELETE_STEP = "deleteStep";
     private static final int CHUNK_SIZE = 20;
 
-    @Bean
-    public JpaPagingItemReader<Store> deleteJobReader() {
-        return new JpaPagingItemReaderBuilder<Store>()
-                .name("storeItemReader")
-                .entityManagerFactory(entityManagerFactory)
-                .pageSize(CHUNK_SIZE)                                   // 조회개수
-                .queryString("SELECT item FROM Store item")             // 조건절 설정
-                .build();
-    }
-
-//    /**
-//     * 커서단위로 읽어들이고, 해당 정크사이즈만큼 writer 에서 하도록 한다.
-//     * @return
-//     */
 //    @Bean
-//    public JdbcCursorItemReader<Store> deleteJobReader() {
-//        return new JdbcCursorItemReaderBuilder<Store>()
-//                .dataSource(dataSource)
+//    public JpaPagingItemReader<Store> deleteJobReader() {
+//        return new JpaPagingItemReaderBuilder<Store>()
 //                .name("storeItemReader")
-//                .sql("SELECT id, no, name, address, phone_number FROM store")
-//                .rowMapper(new RowMapper<Store>(){
-//                    @Override
-//                    public Store mapRow(ResultSet rs, int rowNum) throws SQLException {
-//                        Store store = Store.builder()
-//                                .no(rs.getLong("no"))
-//                                .name(rs.getString("name"))
-//                                .address(rs.getString("address"))
-//                                .phoneNumber(rs.getString("phone_number"))
-//                                .build();
-//                        store.updateId(rs.getLong("id"));
-//                        return store;
-//                    }
-//                })
-//                .fetchSize(CHUNK_SIZE)          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
-//                .driverSupportsAbsolute(true)   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
+//                .entityManagerFactory(entityManagerFactory)
+//                .pageSize(CHUNK_SIZE)                                   // 조회개수
+//                .queryString("SELECT item FROM Store item")             // 조건절 설정
 //                .build();
 //    }
+
+    /**
+     * 커서단위로 읽어들이고, 해당 정크사이즈만큼 writer 에서 하도록 한다.
+     * @return
+     */
+    @Bean
+    public JdbcCursorItemReader<Long> deleteJobReader() {
+        return new JdbcCursorItemReaderBuilder<Long>()
+                .dataSource(dataSource)
+                .name("storeItemReader")
+                .sql("SELECT id FROM store")
+                .rowMapper((rs, rowNum) -> rs.getLong("id"))
+                .fetchSize(CHUNK_SIZE)          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
+                .driverSupportsAbsolute(true)   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
+                .build();
+    }
 
     @Bean
     public StoreItemDeleteProcessor deleteJobProcessor() {
@@ -76,7 +64,7 @@ public class DeleteStepConfiguration {
     }
 
     @Bean
-    public ItemWriter<Store> deleteJobWriter() {
+    public ItemWriter<Long> deleteJobWriter() {
         return new CustomStoreWriter(entityManagerFactory);
     }
 
@@ -84,9 +72,8 @@ public class DeleteStepConfiguration {
     @Qualifier("deleteStep")
     public Step deleteStep() {
         return stepBuilderFactory.get(DELETE_STEP)
-                .<Store, Store> chunk(CHUNK_SIZE)                       // 조회된 개수만큼 writer 를 수행.
+                .<Long, Long> chunk(CHUNK_SIZE)                       // 조회된 개수만큼 writer 를 수행.
                 .reader(deleteJobReader())
-                .processor(deleteJobProcessor())    // processor 는 필수가 아니다. 데이터에 대한 변경로직이 없다면 processor 제외가 가능
                 .writer(deleteJobWriter())
                 .build();
     }

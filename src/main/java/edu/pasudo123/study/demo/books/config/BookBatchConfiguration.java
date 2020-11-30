@@ -1,7 +1,7 @@
 package edu.pasudo123.study.demo.books.config;
 
 import edu.pasudo123.study.demo.books.model.Book;
-import edu.pasudo123.study.demo.notification.NotificationListener;
+import edu.pasudo123.study.demo.notification.CustomNotificationListener;
 import edu.pasudo123.study.demo.books.processor.BookItemProcessor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
@@ -16,12 +16,10 @@ import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.ClassPathResource;
 
 import javax.sql.DataSource;
 
-@Profile("profile-book")
 @Configuration
 @RequiredArgsConstructor
 public class BookBatchConfiguration {
@@ -69,7 +67,7 @@ public class BookBatchConfiguration {
      * job 을 정의한다.
      */
     @Bean
-    public Job importUserJob(NotificationListener listener, Step firstStep){
+    public Job importUserJob(CustomNotificationListener listener, Step firstStep){
         return jobBuilderFactory.get("importUserJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)

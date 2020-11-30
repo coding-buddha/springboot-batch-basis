@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class NotificationListener extends JobExecutionListenerSupport {
+public class CustomNotificationListener extends JobExecutionListenerSupport {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
