@@ -10,6 +10,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.runner.RunWith;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
@@ -26,7 +27,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("dev")
 @ExtendWith(SpringExtension.class)
-//@SpringBatchTest
 @SpringBootTest(classes = {
         StoreBatchConfiguration.class,
         SaveStepConfiguration.class,

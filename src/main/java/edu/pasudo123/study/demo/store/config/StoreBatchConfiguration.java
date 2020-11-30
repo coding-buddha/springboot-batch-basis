@@ -7,14 +7,17 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * 프로파일 구분에 따라 configuration 을 수행할 수 있도록 하였다.
- */
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "batch.model.stores.enabled",
+        havingValue = "true",
+        matchIfMissing = false
+)
 public class StoreBatchConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;

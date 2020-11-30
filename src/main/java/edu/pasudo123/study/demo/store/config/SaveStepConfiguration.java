@@ -11,6 +11,7 @@ import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -19,6 +20,11 @@ import javax.persistence.EntityManagerFactory;
 
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "batch.model.stores.enabled",
+        havingValue = "true",
+        matchIfMissing = false
+)
 public class SaveStepConfiguration {
 
     private final EntityManagerFactory entityManagerFactory;

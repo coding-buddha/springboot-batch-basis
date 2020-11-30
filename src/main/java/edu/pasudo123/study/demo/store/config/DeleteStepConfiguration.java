@@ -1,6 +1,5 @@
 package edu.pasudo123.study.demo.store.config;
 
-import edu.pasudo123.study.demo.store.model.Store;
 import edu.pasudo123.study.demo.store.processor.StoreItemDeleteProcessor;
 import edu.pasudo123.study.demo.store.writer.CustomStoreWriter;
 import lombok.RequiredArgsConstructor;
@@ -8,22 +7,22 @@ import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
-import org.springframework.batch.item.database.JpaPagingItemReader;
 import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuilder;
-import org.springframework.batch.item.database.builder.JpaPagingItemReaderBuilder;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.BeanPropertyRowMapper;
-import org.springframework.jdbc.core.RowMapper;
 
 import javax.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "batch.model.stores.enabled",
+        havingValue = "true",
+        matchIfMissing = false
+)
 public class DeleteStepConfiguration {
 
     private final EntityManagerFactory entityManagerFactory;
@@ -52,9 +51,9 @@ public class DeleteStepConfiguration {
                 .dataSource(dataSource)
                 .name("storeItemReader")
                 .sql("SELECT id FROM store")
-                .rowMapper((rs, rowNum) -> rs.getLong("id"))
-                .fetchSize(CHUNK_SIZE)          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
-                .driverSupportsAbsolute(true)   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
+                .rowMapper((rs, rowNum) -> rs.getLong("id"))    // ResultSet 으로 조회한 id 값만 추출
+                .fetchSize(CHUNK_SIZE)                          // 데이터베이스에서 call 수행 시 반환 갯수 힌트 값
+                .driverSupportsAbsolute(true)                   // jdbc 드라이버가 ResultSet 의 강제이동을 지원하는지 여부, 대규모의 데이터 셋의 경우에 성능 향상을 위해 true 가 좋음.
                 .build();
     }
 

@@ -1,7 +1,16 @@
-
 spring:
   profiles:
     active: dev
+
+## https://reflectoring.io/spring-boot-conditionals/
+batch.model:
+  books.enabled: 'false'
+  stores.enabled: 'false'
+  members.enabled: 'true'
+
+---
+spring:
+  profiles: dev
 
   datasource:
     url: jdbc:mysql://localhost:3306/testdb?useSSL=false&allowPublicKeyRetrieval=true&useTimezone=true&serverTimezone=Asia/Seoul

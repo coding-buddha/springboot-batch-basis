@@ -14,6 +14,7 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
@@ -22,6 +23,11 @@ import javax.sql.DataSource;
 
 @Configuration
 @RequiredArgsConstructor
+@ConditionalOnProperty(
+        value = "batch.model.books.enabled",
+        havingValue = "true",
+        matchIfMissing = false
+)
 public class BookBatchConfiguration {
 
     private final JobBuilderFactory jobBuilderFactory;
@@ -67,7 +73,7 @@ public class BookBatchConfiguration {
      * job 을 정의한다.
      */
     @Bean
-    public Job importUserJob(CustomNotificationListener listener, Step firstStep){
+    public Job importUserJob(CustomNotificationListener listener, Step firstStep) {
         return jobBuilderFactory.get("importUserJob")
                 .incrementer(new RunIdIncrementer())
                 .listener(listener)
@@ -79,7 +85,7 @@ public class BookBatchConfiguration {
     @Bean
     public Step firstStep(JdbcBatchItemWriter<Book> writer) {
         return stepBuilderFactory.get("firstStep")
-                .<Book, Book> chunk(100)
+                .<Book, Book>chunk(100)
                 .reader(reader())
                 .processor(processor())
                 .writer(writer)
