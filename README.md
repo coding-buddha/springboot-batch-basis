@@ -39,6 +39,7 @@
 * [spring batch 테스트코드 작성 시 롤백은 어떻게 하는가?](#)
     * https://stackoverflow.com/questions/47884685/rollback-spring-batch-job
     * https://docs.spring.io/spring-batch/docs/current/reference/html/job.html#txConfigForJobRepository
+* [batch 메타테이블의 역할](./docs/batch_meta_data_table.md)
 
 ## reference
 * https://docs.spring.io/spring-batch/docs/current/reference/html/index.html

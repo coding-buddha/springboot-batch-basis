@@ -53,6 +53,7 @@ public class MemberBatchConfiguration {
                 .listener(new MemberJobListener())
                 .start(clearDbStep())
                 .next(csvToDbStep())
+
                 /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
                 .next(changeUpdateStep())
                     .on("COMPLETED").to(changeDeleteStep())

@@ -7,7 +7,7 @@ import org.springframework.batch.core.listener.JobExecutionListenerSupport;
 
 /**
  * job 수행이후에 호출되는 콜백 리스너
- *
+ * - 해당 값이 이후에 metadata batch_job_execution 테이블에 삽입된다.
  */
 @Slf4j
 public class MemberJobListener extends JobExecutionListenerSupport {
