@@ -15,5 +15,5 @@ CREATE TABLE member
 (
     id                  BIGINT AUTO_INCREMENT NOT NULL PRIMARY KEY,
     name                VARCHAR(50) NOT NULL,
-    status              ENUM('CREATE', 'UPDATE' ,'DELETE') NOT NULL
+    status              ENUM('CREATE', 'UPDATE', 'UPDATE_FAILED','DELETE', 'DELETE_FAILED') NOT NULL
 )

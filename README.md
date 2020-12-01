@@ -36,7 +36,9 @@
 
 ## 🔥 배치를 작성하면서 겪는 `궁금증`
 * [ItemReader 의 cursor & paging 의 차이](./docs/ItemReader_cursor_vs_paging.md)
-
+* [spring batch 테스트코드 작성 시 롤백은 어떻게 하는가?](#)
+    * https://stackoverflow.com/questions/47884685/rollback-spring-batch-job
+    * https://docs.spring.io/spring-batch/docs/current/reference/html/job.html#txConfigForJobRepository
 
 ## reference
 * https://docs.spring.io/spring-batch/docs/current/reference/html/index.html

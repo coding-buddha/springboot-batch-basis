@@ -1,5 +1,13 @@
+## 테스트 코드 실행 시에 배치잡 수행을 하지 않는다.
+spring:
+  batch:
+    job:
+      enabled: false
 
-spring.main.allow-bean-definition-overriding: true
+batch.model:
+  books.enabled: 'false'
+  stores.enabled: 'true'
+  members.enabled: 'true'
 
 ---
 spring:
