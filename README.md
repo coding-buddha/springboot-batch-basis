@@ -45,3 +45,4 @@
 * https://docs.spring.io/spring-batch/docs/current/reference/html/index.html
 * [jojoldu blog](https://jojoldu.tistory.com/324)
 * [renuevo blog](https://renuevo.github.io/spring/batch/spring-batch-chapter-1/)
+* [batch skip](https://www.baeldung.com/spring-batch-skip-logic)

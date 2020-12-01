@@ -40,10 +40,10 @@ public class MemberJobTests {
         assertThat(jobLauncherTestUtils).isNotNull();
     }
 
-    @BeforeEach
-    void clear() {
-        memberRepository.deleteAllInBatch();
-    }
+//    @BeforeEach
+//    void clear() {
+//        memberRepository.deleteAllInBatch();
+//    }
 
     @Test
     @DisplayName("step 수행한다.")

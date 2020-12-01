@@ -44,15 +44,15 @@ public class MemberBatchConfiguration {
     private final DataSource dataSource;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private static final int CHUNK_SIZE = 10;
+    private static final int CHUNK_SIZE = 2;
 
     @Bean
     @Qualifier("memberJob")
     public Job memberJob() {
         return jobBuilderFactory.get("memberJob")
                 .listener(new MemberJobListener())
-                .start(clearDbStep())
-                .next(csvToDbStep())
+                .flow(csvToDbStep())
+                .next(clearDbStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
                 .next(changeUpdateStep())
@@ -138,7 +138,6 @@ public class MemberBatchConfiguration {
     public ItemProcessor<Member, Member> changeUpdateProcessor() {
         return member -> {
             member.changeStatusToUpdate();
-//            member.doForceError();
             return member;
         };
     }
