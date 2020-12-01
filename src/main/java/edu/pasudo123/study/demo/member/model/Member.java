@@ -54,4 +54,8 @@ public class Member {
     public void changeStatusToDeleteFailed() {
         this.status = Status.DELETE_FAILED;
     }
+
+    public void doForceError() {
+        throw new RuntimeException("doForceError");
+    }
 }

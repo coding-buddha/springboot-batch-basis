@@ -54,10 +54,14 @@ public class MemberBatchConfiguration {
                 .listener(notificationListener)
                 .start(clearDbStep())
                 .next(csvToDbStep())
+                /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
                 .next(changeUpdateStep())
                     .on("COMPLETED").to(changeDeleteStep())
+
+                /** changeUpdateStep() 을 수행하고, 종료코드가 FAILED 면 changeUpdateFailedStep() 로 이동 **/
                 .from(changeUpdateStep())
                     .on("FAILED").to(changeUpdateFailedStep())
+
                 .end()
                 .build();
     }
@@ -134,6 +138,7 @@ public class MemberBatchConfiguration {
     public ItemProcessor<Member, Member> changeUpdateProcessor() {
         return member -> {
             member.changeStatusToUpdate();
+//            member.doForceError();
             return member;
         };
     }
