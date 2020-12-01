@@ -2,7 +2,6 @@ package edu.pasudo123.study.demo.member;
 
 import edu.pasudo123.study.demo.MemberBatchConfigurationForTest;
 import edu.pasudo123.study.demo.member.config.MemberBatchConfiguration;
-import edu.pasudo123.study.demo.member.notification.MemberJobNotificationListener;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -23,14 +22,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         MemberBatchConfiguration.class,
-        MemberJobNotificationListener.class
 })
 @ContextConfiguration(classes = {MemberBatchConfigurationForTest.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("멤버 잡은")
 public class MemberJobTests {
 
-    @Autowired private MemberJobNotificationListener memberJobNotificationListener;
     @Autowired private JobLauncherTestUtils jobLauncherTestUtils;
     @Autowired private JobRepositoryTestUtils jobRepositoryTestUtils;
 

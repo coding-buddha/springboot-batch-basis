@@ -3,8 +3,8 @@ package edu.pasudo123.study.demo.member.config;
 import edu.pasudo123.study.demo.member.mapper.MemberRowMapper;
 import edu.pasudo123.study.demo.member.model.Member;
 import edu.pasudo123.study.demo.member.model.MemberItem;
-import edu.pasudo123.study.demo.member.notification.MemberJobNotificationListener;
-import edu.pasudo123.study.demo.member.notification.MemberUpdateListener;
+import edu.pasudo123.study.demo.member.notification.MemberJobListener;
+import edu.pasudo123.study.demo.member.notification.MemberUpdateStepListener;
 import lombok.RequiredArgsConstructor;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
@@ -44,14 +44,13 @@ public class MemberBatchConfiguration {
     private final DataSource dataSource;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private final MemberJobNotificationListener notificationListener;
     private static final int CHUNK_SIZE = 10;
 
     @Bean
     @Qualifier("memberJob")
     public Job memberJob() {
         return jobBuilderFactory.get("memberJob")
-                .listener(notificationListener)
+                .listener(new MemberJobListener())
                 .start(clearDbStep())
                 .next(csvToDbStep())
                 /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
@@ -151,7 +150,7 @@ public class MemberBatchConfiguration {
                 .reader(createToUpdateReader())
                 .processor(changeUpdateProcessor())
                 .writer(jpaItemWriter())
-                .listener(new MemberUpdateListener())
+                .listener(new MemberUpdateStepListener())
                 .build();
     }
 

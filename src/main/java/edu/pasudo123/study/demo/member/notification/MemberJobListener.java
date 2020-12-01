@@ -4,11 +4,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.listener.JobExecutionListenerSupport;
-import org.springframework.stereotype.Component;
 
+/**
+ * job 수행이후에 호출되는 콜백 리스너
+ *
+ */
 @Slf4j
-@Component
-public class MemberJobNotificationListener extends JobExecutionListenerSupport {
+public class MemberJobListener extends JobExecutionListenerSupport {
 
     @Override
     public void afterJob(JobExecution jobExecution) {
