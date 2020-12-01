@@ -2,6 +2,7 @@ package edu.pasudo123.study.demo.member;
 
 import edu.pasudo123.study.demo.MemberBatchConfigurationForTest;
 import edu.pasudo123.study.demo.member.config.MemberBatchConfiguration;
+import edu.pasudo123.study.demo.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -22,12 +23,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         MemberBatchConfiguration.class,
+        MemberRepository.class
 })
 @ContextConfiguration(classes = {MemberBatchConfigurationForTest.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
 @DisplayName("멤버 잡은")
 public class MemberJobTests {
 
+    @Autowired private MemberRepository memberRepository;
     @Autowired private JobLauncherTestUtils jobLauncherTestUtils;
     @Autowired private JobRepositoryTestUtils jobRepositoryTestUtils;
 
@@ -39,8 +42,7 @@ public class MemberJobTests {
 
     @BeforeEach
     void clear() {
-        // MemberBatchConfiguration 의 job 안에 step 이 모두 등록되어있어야 사용이 가능하다.
-        jobLauncherTestUtils.launchStep("clearDbStep");
+        memberRepository.deleteAllInBatch();
     }
 
     @Test
