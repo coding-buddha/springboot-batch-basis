@@ -20,6 +20,9 @@ import org.springframework.test.context.junit.jupiter.SpringExtension;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+/**
+ * https://docs.spring.io/spring-batch/docs/current/reference/html/job.html#runningJobsFromCommandLine
+ */
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         MemberBatchConfiguration.class,
@@ -40,14 +43,14 @@ public class MemberJobTests {
         assertThat(jobLauncherTestUtils).isNotNull();
     }
 
-//    @BeforeEach
-//    void clear() {
-//        memberRepository.deleteAllInBatch();
-//    }
+    @BeforeEach
+    void clear() {
+        memberRepository.deleteAllInBatch();
+    }
 
     @Test
-    @DisplayName("step 수행한다.")
-    public void memberStepTest() throws Exception {
+    @DisplayName("[csvToDbStep] 수행한다.")
+    public void csvToDbStepTest() throws Exception {
         // when
         final JobExecution jobExecution = jobLauncherTestUtils.launchStep("csvToDbStep");
         final JobInstance jobInstance = jobExecution.getJobInstance();
@@ -59,7 +62,20 @@ public class MemberJobTests {
     }
 
     @Test
-    @DisplayName("job 을 수행한다.")
+    @DisplayName("[clearDbStep] 수행한다.")
+    public void clearDbStepTest() throws Exception {
+        // when
+        final JobExecution jobExecution = jobLauncherTestUtils.launchStep("clearDbStep");
+        final JobInstance jobInstance = jobExecution.getJobInstance();
+        final ExitStatus exitStatus = jobExecution.getExitStatus();
+
+        // then
+        assertThat(jobInstance.getJobName()).isEqualTo("TestJob");
+        assertThat(exitStatus.getExitCode()).isEqualTo("COMPLETED");
+    }
+
+    @Test
+    @DisplayName("[job] 을 수행한다.")
     public void memberJobTest() throws Exception {
         // when
         final JobExecution jobExecution = jobLauncherTestUtils.launchJob();

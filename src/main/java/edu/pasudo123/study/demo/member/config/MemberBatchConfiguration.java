@@ -6,10 +6,12 @@ import edu.pasudo123.study.demo.member.model.MemberItem;
 import edu.pasudo123.study.demo.member.notification.MemberJobListener;
 import edu.pasudo123.study.demo.member.notification.MemberUpdateStepListener;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.batch.item.ItemWriter;
 import org.springframework.batch.item.database.JdbcCursorItemReader;
@@ -22,6 +24,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
@@ -31,6 +34,7 @@ import javax.persistence.EntityManagerFactory;
 import javax.persistence.Query;
 import javax.sql.DataSource;
 
+@Slf4j
 @Configuration
 @RequiredArgsConstructor
 @ConditionalOnProperty(
@@ -47,12 +51,13 @@ public class MemberBatchConfiguration {
     private static final int CHUNK_SIZE = 2;
 
     @Bean
-    @Qualifier("memberJob")
     public Job memberJob() {
         return jobBuilderFactory.get("memberJob")
+                .incrementer(new RunIdIncrementer())    // 동일 JobParameter 에 대해서 다시 시작하도록 설정하기 위함
+                .preventRestart()                       // 동일 JobInstance 에 대해서는 다시 시작하지 않도록 설정함
                 .listener(new MemberJobListener())
-                .flow(csvToDbStep())
-                .next(clearDbStep())
+                .flow(clearDbStep())
+                .next(csvToDbStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
                 .next(changeUpdateStep())
@@ -71,7 +76,6 @@ public class MemberBatchConfiguration {
      * 1. reader / processor / writer
      */
     @Bean
-    @Qualifier("csvFileReader")
     public FlatFileItemReader<MemberItem> csvFileReader() {
         return new FlatFileItemReaderBuilder<MemberItem>()
                 .name("memberItemReader")
@@ -98,6 +102,7 @@ public class MemberBatchConfiguration {
     @Bean
     @Qualifier("csvToDbStep")
     public Step csvToDbStep() {
+
         return stepBuilderFactory.get("csvToDbStep")
                 .<MemberItem, Member> chunk(CHUNK_SIZE)
                 .reader(csvFileReader())
@@ -302,6 +307,5 @@ public class MemberBatchConfiguration {
                 .reader(dbClearReader())
                 .writer(dbClearWriter())
                 .build();
-
     }
 }
