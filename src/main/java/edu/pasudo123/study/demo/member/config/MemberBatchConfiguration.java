@@ -69,7 +69,7 @@ public class MemberBatchConfiguration {
                     .next(changeCompletedStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 FAILED 면 changeUpdateFailedStep() 로 이동 **/
-                .next(changeUpdateStep())
+                .from(changeUpdateStep())
                     .on("FAILED").to(middleStep)
                     .next(changeUpdateFailedStep())
                     .next(changeCompletedStep())
