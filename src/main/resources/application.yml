@@ -5,6 +5,7 @@ spring:
     job:
       names: ${job.name:NONE} # program argument 를 통해서 원하는 job 전달
 
+
 ## https://reflectoring.io/spring-boot-conditionals/
 batch.model:
   books.enabled: 'false'

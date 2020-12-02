@@ -20,11 +20,11 @@ import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuild
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
+import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Primary;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.dao.DataAccessResourceFailureException;
 import org.springframework.orm.jpa.EntityManagerFactoryUtils;
@@ -48,37 +48,45 @@ public class MemberBatchConfiguration {
     private final DataSource dataSource;
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
-    private static final int CHUNK_SIZE = 2;
+    private static final int CHUNK_SIZE = 10;
+
+    @Qualifier("middleStep")
+    private final Step middleStep;
 
     @Bean
     public Job memberJob() {
         return jobBuilderFactory.get("memberJob")
+                .preventRestart()
                 .incrementer(new RunIdIncrementer())    // 동일 JobParameter 에 대해서 다시 시작하도록 설정하기 위함
-                .preventRestart()                       // 동일 JobInstance 에 대해서는 다시 시작하지 않도록 설정함
                 .listener(new MemberJobListener())
                 .flow(clearDbStep())
                 .next(csvToDbStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
                 .next(changeUpdateStep())
-                    .on("COMPLETED").to(changeDeleteStep())
+                    .on("COMPLETED").to(middleStep)
+                    .next(changeDeleteStep())
+                    .next(changeCompletedStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 FAILED 면 changeUpdateFailedStep() 로 이동 **/
-                .from(changeUpdateStep())
-                    .on("FAILED").to(changeUpdateFailedStep())
+                .next(changeUpdateStep())
+                    .on("FAILED").to(middleStep)
+                    .next(changeUpdateFailedStep())
+                    .next(changeCompletedStep())
 
                 .end()
                 .build();
     }
 
     /**
+     * csvFile
      * ======================================
      * 1. reader / processor / writer
      */
     @Bean
     public FlatFileItemReader<MemberItem> csvFileReader() {
         return new FlatFileItemReaderBuilder<MemberItem>()
-                .name("memberItemReader")
+                .name("csvFileReader")
                 .resource(new ClassPathResource("csv/member_list.csv"))
                 .delimited()
                 .names("name", "status")
@@ -123,16 +131,17 @@ public class MemberBatchConfiguration {
     }
 
     /**
+     * changeUpdate
      * ======================================
      * 2. reader / writer
      */
     @Bean
-    public JdbcCursorItemReader<Member> createToUpdateReader() {
+    public JdbcCursorItemReader<Member> changeUpdateReader() {
         //noinspection DuplicatedCode
         return new JdbcCursorItemReaderBuilder<Member>()
                 .dataSource(dataSource)
-                .name("memberClearItemReader")
-                .sql("SELECT id, name, status FROM member")
+                .name("changeUpdateReader")
+                .sql("SELECT id, name, status FROM member WHERE id")
                 .rowMapper(new MemberRowMapper())
                 .fetchSize(CHUNK_SIZE)
                 .driverSupportsAbsolute(true)
@@ -142,7 +151,10 @@ public class MemberBatchConfiguration {
     @Bean
     public ItemProcessor<Member, Member> changeUpdateProcessor() {
         return member -> {
+            log.info("======> update 상태로 변경합니다.");
             member.changeStatusToUpdate();
+            // step 의 조건절을 테스트하기 위함
+             member.doForceError();
             return member;
         };
     }
@@ -152,7 +164,7 @@ public class MemberBatchConfiguration {
     public Step changeUpdateStep() {
         return stepBuilderFactory.get("changeUpdateStep")
                 .<Member, Member> chunk(CHUNK_SIZE)
-                .reader(createToUpdateReader())
+                .reader(changeUpdateReader())
                 .processor(changeUpdateProcessor())
                 .writer(jpaItemWriter())
                 .listener(new MemberUpdateStepListener())
@@ -160,6 +172,7 @@ public class MemberBatchConfiguration {
     }
 
     /**
+     * updateToFailed
      * ======================================
      * 2-5. reader / writer
      */
@@ -168,7 +181,7 @@ public class MemberBatchConfiguration {
         //noinspection DuplicatedCode
         return new JdbcCursorItemReaderBuilder<Member>()
                 .dataSource(dataSource)
-                .name("memberClearItemReader")
+                .name("updateToFailedReader")
                 .sql("SELECT id, name, status FROM member")
                 .rowMapper(new MemberRowMapper())
                 .fetchSize(CHUNK_SIZE)
@@ -179,6 +192,7 @@ public class MemberBatchConfiguration {
     @Bean
     public ItemProcessor<Member, Member> changeUpdateFailedProcessor() {
         return member -> {
+            log.info("======> update failed 상태로 변경합니다.");
             member.changeStatusToUpdateFailed();
             return member;
         };
@@ -196,6 +210,7 @@ public class MemberBatchConfiguration {
     }
 
     /**
+     * changeDelete
      * ======================================
      * 3. reader / writer
      */
@@ -204,7 +219,7 @@ public class MemberBatchConfiguration {
         //noinspection DuplicatedCode
         return new JdbcCursorItemReaderBuilder<Member>()
                 .dataSource(dataSource)
-                .name("memberClearItemReader")
+                .name("changeDeleteReader")
                 .sql("SELECT id, name, status FROM member")
                 .rowMapper(new MemberRowMapper())
                 .fetchSize(CHUNK_SIZE)
@@ -215,6 +230,7 @@ public class MemberBatchConfiguration {
     @Bean
     public ItemProcessor<Member, Member> changeDeleteProcessor() {
         return member -> {
+            log.info("======> delete 상태로 변경합니다.");
             member.changeStatusToDelete();
             return member;
         };
@@ -232,6 +248,7 @@ public class MemberBatchConfiguration {
     }
 
     /**
+     * deleteToFailed
      * ======================================
      * 3-5. reader / writer
      */
@@ -240,7 +257,7 @@ public class MemberBatchConfiguration {
         //noinspection DuplicatedCode
         return new JdbcCursorItemReaderBuilder<Member>()
                 .dataSource(dataSource)
-                .name("memberClearItemReader")
+                .name("deleteToFailedReader")
                 .sql("SELECT id, name, status FROM member")
                 .rowMapper(new MemberRowMapper())
                 .fetchSize(CHUNK_SIZE)
@@ -251,6 +268,7 @@ public class MemberBatchConfiguration {
     @Bean
     public ItemProcessor<Member, Member> changeDeleteFailedProcessor() {
         return member -> {
+            log.info("======> delete failed 상태로 변경합니다.");
             member.changeStatusToDeleteFailed();
             return member;
         };
@@ -259,7 +277,7 @@ public class MemberBatchConfiguration {
     @Bean
     @Qualifier("changeDeleteFailedStep")
     public Step changeDeleteFailedStep() {
-        return stepBuilderFactory.get("changeUpdateFailedStep")
+        return stepBuilderFactory.get("changeDeleteFailedStep")
                 .<Member, Member> chunk(CHUNK_SIZE)
                 .reader(deleteToFailedReader())
                 .processor(changeDeleteFailedProcessor())
@@ -268,6 +286,7 @@ public class MemberBatchConfiguration {
     }
 
     /**
+     * dbClear
      * ======================================
      * 4. reader / writer
      */
@@ -275,7 +294,7 @@ public class MemberBatchConfiguration {
     public JdbcCursorItemReader<Long> dbClearReader() {
         return new JdbcCursorItemReaderBuilder<Long>()
                 .dataSource(dataSource)
-                .name("memberClearItemReader")
+                .name("dbClearReader")
                 .sql("SELECT id FROM member")
                 .rowMapper((rs, rowNum) -> rs.getLong("id"))
                 .fetchSize(CHUNK_SIZE)
@@ -306,6 +325,44 @@ public class MemberBatchConfiguration {
                 .<Long, Long> chunk(CHUNK_SIZE)
                 .reader(dbClearReader())
                 .writer(dbClearWriter())
+                .build();
+    }
+
+    /**
+     * completed
+     * ======================================
+     * 5. reader / writer
+     */
+    @Bean
+    public JdbcCursorItemReader<Member> completedReader() {
+        //noinspection DuplicatedCode
+        return new JdbcCursorItemReaderBuilder<Member>()
+                .dataSource(dataSource)
+                .name("completedReader")
+                .sql("SELECT id, name, status FROM member")
+                .rowMapper(new MemberRowMapper())
+                .fetchSize(CHUNK_SIZE)
+                .driverSupportsAbsolute(true)
+                .build();
+    }
+
+    @Bean
+    public ItemProcessor<Member, Member> completedProcessor() {
+        return member -> {
+            log.info("======> completed 상태로 변경합니다.");
+            member.changeToCompleted();
+            return member;
+        };
+    }
+
+    @Bean
+    @Qualifier("changeCompletedStep")
+    public Step changeCompletedStep() {
+        return stepBuilderFactory.get("changeCompletedStep")
+                .<Member, Member> chunk(CHUNK_SIZE)
+                .reader(completedReader())
+                .processor(completedProcessor())
+                .writer(jpaItemWriter())
                 .build();
     }
 }

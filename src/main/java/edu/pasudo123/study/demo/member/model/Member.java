@@ -20,7 +20,7 @@ public class Member {
     private String name;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, columnDefinition = "ENUM('CREATE', 'UPDATE', 'DELETE')")
+    @Column(name = "status", nullable = false, columnDefinition = "ENUM('CREATE', 'UPDATE', 'UPDATE_FAILED', 'DELETE', 'DELETE_FAILED', 'COMPLETED')")
     private Status status = Status.CREATE;
 
     public void updateId(final Long id) {
@@ -30,7 +30,8 @@ public class Member {
     enum Status {
         CREATE,
         UPDATE, UPDATE_FAILED,
-        DELETE, DELETE_FAILED
+        DELETE, DELETE_FAILED,
+        COMPLETED
     }
 
     @Builder
@@ -53,6 +54,10 @@ public class Member {
 
     public void changeStatusToDeleteFailed() {
         this.status = Status.DELETE_FAILED;
+    }
+
+    public void changeToCompleted() {
+        this.status = Status.COMPLETED;
     }
 
     public void doForceError() {
