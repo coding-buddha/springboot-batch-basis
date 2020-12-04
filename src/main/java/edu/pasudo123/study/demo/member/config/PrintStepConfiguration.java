@@ -17,12 +17,33 @@ public class PrintStepConfiguration {
     private final StepBuilderFactory stepBuilderFactory;
 
     @Bean
-    @Qualifier("middleStep")
-    public Step middleStep() {
-        return stepBuilderFactory.get("middleStep")
+    @Qualifier("middleSuccessStep")
+    public Step middleSuccessStep() {
+        return stepBuilderFactory.get("middleSuccessStep")
                 .tasklet((contribution, chunkContext) -> {
                     log.info("****************************************************");
+                    log.info("***                                              ***");
+                    log.info("***                                              ***");
+                    log.info("***              MIDDLE SUCCESS STEP             ***");
+                    log.info("***                                              ***");
+                    log.info("***                                              ***");
                     log.info("****************************************************");
+                    return RepeatStatus.FINISHED;
+                })
+                .build();
+    }
+
+    @Bean
+    @Qualifier("middleFailedStep")
+    public Step middleFailedStep() {
+        return stepBuilderFactory.get("middleFailedStep")
+                .tasklet((contribution, chunkContext) -> {
+                    log.info("****************************************************");
+                    log.info("***                                              ***");
+                    log.info("***                                              ***");
+                    log.info("***              MIDDLE FAILED STEP              ***");
+                    log.info("***                                              ***");
+                    log.info("***                                              ***");
                     log.info("****************************************************");
                     return RepeatStatus.FINISHED;
                 })

@@ -2,6 +2,7 @@ package edu.pasudo123.study.demo.member;
 
 import edu.pasudo123.study.demo.MemberBatchConfigurationForTest;
 import edu.pasudo123.study.demo.member.config.MemberBatchConfiguration;
+import edu.pasudo123.study.demo.member.config.PrintStepConfiguration;
 import edu.pasudo123.study.demo.member.repository.MemberRepository;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -11,9 +12,11 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
+import org.springframework.batch.core.Step;
 import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.JobRepositoryTestUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
@@ -26,7 +29,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(SpringExtension.class)
 @SpringBootTest(classes = {
         MemberBatchConfiguration.class,
-        MemberRepository.class
+        PrintStepConfiguration.class,
+        MemberRepository.class,
 })
 @ContextConfiguration(classes = {MemberBatchConfigurationForTest.class})
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)

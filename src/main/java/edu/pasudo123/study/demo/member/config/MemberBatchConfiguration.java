@@ -20,7 +20,6 @@ import org.springframework.batch.item.database.builder.JdbcCursorItemReaderBuild
 import org.springframework.batch.item.database.builder.JpaItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.repeat.RepeatStatus;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
@@ -50,8 +49,11 @@ public class MemberBatchConfiguration {
     private final StepBuilderFactory stepBuilderFactory;
     private static final int CHUNK_SIZE = 10;
 
-    @Qualifier("middleStep")
-    private final Step middleStep;
+    @Qualifier("middleSuccessStep")
+    private final Step middleSuccessStep;
+
+    @Qualifier("middleFailedStep")
+    private final Step middleFailedStep;
 
     @Bean
     public Job memberJob() {
@@ -59,18 +61,18 @@ public class MemberBatchConfiguration {
                 .preventRestart()
                 .incrementer(new RunIdIncrementer())    // 동일 JobParameter 에 대해서 다시 시작하도록 설정하기 위함
                 .listener(new MemberJobListener())
-                .flow(clearDbStep())
+                .start(clearDbStep())
                 .next(csvToDbStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 COMPLETED 면 changeDeleteStep() 로 이동 **/
-                .next(changeUpdateStep())
-                    .on("COMPLETED").to(middleStep)
+                /** conditional step 을 수행할 시에, to() 메소드 인자값이 동일한 step 이면 올바르게 작동되지 않음 (SimpleFlow.java 의 nextState() 참고) **/                .next(changeUpdateStep())
+                    .on("COMPLETED").to(middleSuccessStep)
                     .next(changeDeleteStep())
                     .next(changeCompletedStep())
 
                 /** changeUpdateStep() 을 수행하고, 종료코드가 FAILED 면 changeUpdateFailedStep() 로 이동 **/
                 .from(changeUpdateStep())
-                    .on("FAILED").to(middleStep)
+                    .on("FAILED").to(middleFailedStep)
                     .next(changeUpdateFailedStep())
                     .next(changeCompletedStep())
 
@@ -154,7 +156,7 @@ public class MemberBatchConfiguration {
             log.info("======> update 상태로 변경합니다.");
             member.changeStatusToUpdate();
             // step 의 조건절을 테스트하기 위함
-             member.doForceError();
+//            member.doForceError();
             return member;
         };
     }
